@@ -4,8 +4,6 @@ import {v4 as uuidv4} from 'uuid'
 
 import './index.css'
 
-const passwordList = []
-
 class PasswordManager extends Component {
   state = {
     passwordList: [],
@@ -51,8 +49,16 @@ class PasswordManager extends Component {
     }))
   }
 
+  onClickDeleteImage = id => {
+    const {passwordList} = this.state
+    const filteredList = passwordList.filter(eachItem => eachItem.id !== id)
+    this.setState({
+      passwordList: filteredList,
+    })
+  }
+
   render() {
-    const {websiteInput, usernameInput, passwordInput} = this.state
+    const {websiteInput, usernameInput, passwordInput, passwordList} = this.state
     return (
       <div className="bg-container">
         <img
@@ -111,7 +117,7 @@ class PasswordManager extends Component {
                 value={passwordInput}
               />
             </div>
-            <button className="button" type="button">
+            <button className="button" type="submit">
               Add
             </button>
           </form>
@@ -145,17 +151,23 @@ class PasswordManager extends Component {
               <div className="password-details">
                 <div className="profile-logo">P</div>
                 <div>
-                  <p className="user-details-paragraph">{websiteInput}</p>
-                  <p className="user-details-paragraph">{usernameInput}</p>
+                  <p className="user-details-paragraph">{eachPassword.websiteInput}</p>
+                  <p className="user-details-paragraph">{eachPassword.usernameInput}</p>
                   <p className="user-details-paragraph">
-                    {passwordInput.length}
+                    {eachPassword.passwordInput.length}
                   </p>
                 </div>
+              <button
+                  type="button"
+                  className="delete-button"
+                  onClick={this.onClickDeleteImage}
+                >
                 <img
                   src="https://assets.ccbp.in/frontend/react-js/password-manager-delete-img.png"
                   className="delete-image"
                   alt="delete"
                 />
+              </button>
               </div>
             ))}
           </div>
