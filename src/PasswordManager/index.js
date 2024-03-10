@@ -10,6 +10,7 @@ class PasswordManager extends Component {
     websiteInput: '',
     usernameInput: '',
     passwordInput: '',
+    isChecked: false,
   }
 
   onChangeWebsite = event => {
@@ -57,8 +58,14 @@ class PasswordManager extends Component {
     })
   }
 
+  onClickCheckbox = () => {
+    this.setState(prevState => ({
+      isChecked: !prevState.isChecked,
+    }))
+  }
+
   render() {
-    const {websiteInput, usernameInput, passwordInput, passwordList} = this.state
+    const {websiteInput, usernameInput, passwordInput, passwordList, isChecked} = this.state
     return (
       <div className="bg-container">
         <img
@@ -143,7 +150,7 @@ class PasswordManager extends Component {
           </div>
           <hr className="horizontal-line-2" />
           <div className="checkbox-container">
-            <input type="checkbox" className="checkbox" />
+            <input type="checkbox" className="checkbox" onClick={this.onClickCheckbox}/>
             <p className="paragraph">Show Password</p>
           </div>
           <div className="password-details-container">
@@ -154,7 +161,9 @@ class PasswordManager extends Component {
                   <p className="user-details-paragraph">{eachPassword.websiteInput}</p>
                   <p className="user-details-paragraph">{eachPassword.usernameInput}</p>
                   <p className="user-details-paragraph">
-                    {eachPassword.passwordInput.length}
+                    {isChecked
+                      ? `${eachPassword.passwordInput}`
+                      : eachPassword.passwordInput.length}
                   </p>
                 </div>
               <button
