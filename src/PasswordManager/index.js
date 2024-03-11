@@ -4,6 +4,8 @@ import {v4 as uuidv4} from 'uuid'
 
 import './index.css'
 
+const colorList = ['yellow', 'green', 'orange', 'brown', 'blue']
+
 class PasswordManager extends Component {
   state = {
     passwordList: [],
@@ -11,6 +13,8 @@ class PasswordManager extends Component {
     usernameInput: '',
     passwordInput: '',
     isChecked: false,
+    searchInput: '',
+    isTrue: false,
   }
 
   onChangeWebsite = event => {
@@ -34,12 +38,16 @@ class PasswordManager extends Component {
   onSubmitPasswordData = event => {
     event.preventDefault()
     const {websiteInput, usernameInput, passwordInput} = this.state
+    const initial = websiteInput.slice(0, 1).toUpperCase()
+    const classValue = colorList[Math.floor(Math.random() * 5)]
 
     const newData = {
       id: uuidv4(),
+      initial,
       websiteInput,
       usernameInput,
       passwordInput,
+      classValue,
     }
 
     this.setState(prevState => ({
@@ -47,14 +55,18 @@ class PasswordManager extends Component {
       websiteInput: '',
       usernameInput: '',
       passwordInput: '',
+      searchInput: '',
+      isTrue: true,
     }))
   }
 
   onClickDeleteImage = id => {
     const {passwordList} = this.state
     const filteredList = passwordList.filter(eachItem => eachItem.id !== id)
+    const caseOf = filteredList.length !== 0
     this.setState({
       passwordList: filteredList,
+      isTrue: caseOf,
     })
   }
 
@@ -64,8 +76,30 @@ class PasswordManager extends Component {
     }))
   }
 
+  searchList = event => {
+    this.setState({
+      searchInput: event.target.value,
+    })
+  }
+
   render() {
-    const {websiteInput, usernameInput, passwordInput, passwordList, isChecked} = this.state
+    const {
+      websiteInput,
+      usernameInput,
+      passwordInput,
+      passwordList,
+      isChecked,
+      searchInput,
+    } = this.state
+    let {isTrue} = this.state
+    const newList = passwordList.filter(eachValue =>
+      eachValue.websiteInput.toLowerCase().includes(searchInput.toLowerCase()),
+    )
+    if (newList.length === 0) {
+      isTrue = false
+    } else {
+      isTrue = true
+    }
     return (
       <div className="bg-container">
         <img
@@ -137,6 +171,7 @@ class PasswordManager extends Component {
         <div className="bottom-container">
           <div className="flex-container-2">
             <h1 className="heading-2">Your Passwords</h1>
+            <p className="count-password">{newList.length}</p>
             <div className="input-container">
               <div className="logo-container-2">
                 <img
@@ -145,41 +180,74 @@ class PasswordManager extends Component {
                   className="search-logo"
                 />
               </div>
-              <input type="search" className="input-2" placeholder="Search" />
+              <input
+                type="search"
+                className="input-2"
+                placeholder="Search"
+                onChange={this.searchList}
+              />
             </div>
           </div>
           <hr className="horizontal-line-2" />
           <div className="checkbox-container">
-            <input type="checkbox" className="checkbox" onClick={this.onClickCheckbox}/>
+            <input
+              type="checkbox"
+              className="checkbox"
+              onClick={this.onClickCheckbox}
+            />
             <p className="paragraph">Show Password</p>
           </div>
-          <div className="password-details-container">
-            {passwordList.map(eachPassword => (
-              <div className="password-details">
-                <div className="profile-logo">P</div>
-                <div>
-                  <p className="user-details-paragraph">{eachPassword.websiteInput}</p>
-                  <p className="user-details-paragraph">{eachPassword.usernameInput}</p>
-                  <p className="user-details-paragraph">
-                    {isChecked
-                      ? `${eachPassword.passwordInput}`
-                      : eachPassword.passwordInput.length}
-                  </p>
+          {!isTrue && (
+            <div className="empty-state">
+              <img
+                src="https://assets.ccbp.in/frontend/react-js/no-passwords-img.png"
+                className="empty-image"
+                alt="no password"
+              />
+              <p className="no-password">No Password</p>
+            </div>
+          )}
+          {isTrue && (
+            <div className="password-details-container">
+              {newList.map(eachPassword => (
+                <div className="password-details">
+                  <div className={`profile-logo ${eachPassword.classValue}`}>
+                    {eachPassword.initial}
+                  </div>
+                  <div>
+                    <p className="user-details-paragraph">
+                      {eachPassword.websiteInput}
+                    </p>
+                    <p className="user-details-paragraph">
+                      {eachPassword.usernameInput}
+                    </p>
+                    <p className="user-details-paragraph">
+                      {isChecked ? (
+                        `${eachPassword.passwordInput}`
+                      ) : (
+                        <img
+                          src="https://assets.ccbp.in/frontend/react-js/password-manager-stars-img.png"
+                          alt="stars"
+                          className="stars-image"
+                        />
+                      )}
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    className="delete-button"
+                    onClick={() => this.onClickDeleteImage(eachPassword.id)}
+                  >
+                    <img
+                      src="https://assets.ccbp.in/frontend/react-js/password-manager-delete-img.png"
+                      className="delete-image"
+                      alt="delete"
+                    />
+                  </button>
                 </div>
-              <button
-                  type="button"
-                  className="delete-button"
-                  onClick={this.onClickDeleteImage}
-                >
-                <img
-                  src="https://assets.ccbp.in/frontend/react-js/password-manager-delete-img.png"
-                  className="delete-image"
-                  alt="delete"
-                />
-              </button>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
     )
